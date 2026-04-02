@@ -57,6 +57,15 @@ body {
   border-top: 1px solid #e3eeee;
 }
 
+.layer-toggle-panel {
+  border-top: 1px solid #e3eeee;
+}
+
+.color-tool-panel {
+  border-top: 1px solid #e3eeee;
+  flex: none;
+}
+
 .panel h2 {
   margin: 0;
   font-size: 0.98rem;
@@ -68,6 +77,16 @@ body {
   border-radius: 6px;
   padding: 8px;
   font-size: 0.92rem;
+}
+
+#toggle-field-select {
+  width: 100%;
+  border: 1px solid #c8dcdc;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 0.92rem;
+  background: #ffffff;
+  color: #17313a;
 }
 
 #feature-list {

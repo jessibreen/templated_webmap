@@ -88,7 +88,23 @@ const POPUP_DATA_INPUTS = {
 
 /*
   ============================================================
-  USER INPUTS: 4) COLORS
+  USER INPUTS: 4) LAYER TOGGLES
+  ============================================================
+*/
+
+const LAYER_TOGGLE_INPUTS = {
+  // Optional property name used to group layer toggles.
+  // Use "" to show one toggle per feature.
+  // Example: "category"
+  toggleFieldKey: "",
+
+  // Show the layer toggle setup panel.
+  showLayerTogglePanel: true
+};
+
+/*
+  ============================================================
+  USER INPUTS: 5) COLORS
   ============================================================
 */
 
@@ -130,6 +146,8 @@ const featureCountEl = document.getElementById("feature-count");
 const fieldListEl = document.getElementById("field-list");
 const fieldCountEl = document.getElementById("field-count");
 const searchEl = document.getElementById("feature-search");
+const toggleFieldSelectEl = document.getElementById("toggle-field-select");
+const copyToggleFieldBtnEl = document.getElementById("copy-toggle-field-btn");
 
 mapElTitle.textContent = TITLE_INPUTS.title;
 mapElSubtitle.textContent = TITLE_INPUTS.subtitle;
@@ -145,6 +163,11 @@ if (!POPUP_DATA_INPUTS.showFieldPanel) {
   if (fieldPanel) fieldPanel.style.display = "none";
 }
 
+if (!LAYER_TOGGLE_INPUTS.showLayerTogglePanel) {
+  const layerTogglePanel = document.querySelector(".layer-toggle-panel");
+  if (layerTogglePanel) layerTogglePanel.style.display = "none";
+}
+
 const map = L.map("map").setView(MAP_CENTER_INPUTS.center, MAP_CENTER_INPUTS.zoom);
 
 L.tileLayer(COLOR_INPUTS.tileUrl, {
@@ -153,6 +176,8 @@ L.tileLayer(COLOR_INPUTS.tileUrl, {
 }).addTo(map);
 
 const featureLayers = [];
+const toggleItems = [];
+let activeToggleFieldKey = LAYER_TOGGLE_INPUTS.toggleFieldKey;
 
 function escapeHtml(value) {
   if (value === null || value === undefined) return "";
@@ -243,28 +268,111 @@ function filterFeatureList(query) {
 }
 
 function addFeatureToList(featureLayer, label) {
-  const item = document.createElement("label");
-  item.className = "feature-item";
-  item.dataset.name = label.toLowerCase();
+  toggleItems.push({
+    layer: featureLayer,
+    label,
+    properties: featureLayer.feature?.properties || {}
+  });
+}
 
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.checked = true;
+function toggleLayerVisibility(layer, visible) {
+  if (visible) {
+    layer.addTo(map);
+  } else {
+    map.removeLayer(layer);
+  }
+}
 
-  const text = document.createElement("span");
-  text.textContent = label;
+function renderFeatureToggleList(fieldKey = "") {
+  featureListEl.innerHTML = "";
 
-  checkbox.addEventListener("change", () => {
-    if (checkbox.checked) {
-      featureLayer.addTo(map);
-    } else {
-      map.removeLayer(featureLayer);
+  const normalizedFieldKey = String(fieldKey || "").trim();
+
+  if (!normalizedFieldKey) {
+    toggleItems.forEach((entry) => {
+      const item = document.createElement("label");
+      item.className = "feature-item";
+      item.dataset.name = entry.label.toLowerCase();
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = map.hasLayer(entry.layer);
+
+      const text = document.createElement("span");
+      text.textContent = entry.label;
+
+      checkbox.addEventListener("change", () => {
+        toggleLayerVisibility(entry.layer, checkbox.checked);
+      });
+
+      item.appendChild(checkbox);
+      item.appendChild(text);
+      featureListEl.appendChild(item);
+    });
+
+    filterFeatureList(searchEl.value || "");
+    return;
+  }
+
+  const groups = new Map();
+  toggleItems.forEach((entry) => {
+    const value = asDisplayValue(entry.properties[normalizedFieldKey]) || "(blank)";
+    if (!groups.has(value)) {
+      groups.set(value, []);
     }
+    groups.get(value).push(entry.layer);
   });
 
-  item.appendChild(checkbox);
-  item.appendChild(text);
-  featureListEl.appendChild(item);
+  [...groups.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .forEach(([value, layers]) => {
+      const item = document.createElement("label");
+      item.className = "feature-item";
+      item.dataset.name = value.toLowerCase();
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = layers.some((layer) => map.hasLayer(layer));
+
+      const text = document.createElement("span");
+      const suffix = layers.length === 1 ? "feature" : "features";
+      text.textContent = `${value} (${layers.length} ${suffix})`;
+
+      checkbox.addEventListener("change", () => {
+        layers.forEach((layer) => toggleLayerVisibility(layer, checkbox.checked));
+      });
+
+      item.appendChild(checkbox);
+      item.appendChild(text);
+      featureListEl.appendChild(item);
+    });
+
+  filterFeatureList(searchEl.value || "");
+}
+
+function renderToggleFieldOptions(fieldSummary) {
+  if (!toggleFieldSelectEl) return;
+
+  toggleFieldSelectEl.innerHTML = "";
+
+  const noneOption = document.createElement("option");
+  noneOption.value = "";
+  noneOption.textContent = "None (toggle each feature)";
+  toggleFieldSelectEl.appendChild(noneOption);
+
+  fieldSummary.forEach((entry) => {
+    const option = document.createElement("option");
+    option.value = entry.key;
+    option.textContent = entry.key;
+    toggleFieldSelectEl.appendChild(option);
+  });
+
+  const hasConfiguredOption = fieldSummary.some((entry) => entry.key === activeToggleFieldKey);
+  if (!hasConfiguredOption) {
+    activeToggleFieldKey = "";
+  }
+
+  toggleFieldSelectEl.value = activeToggleFieldKey;
 }
 
 function styleFeature() {
@@ -441,7 +549,10 @@ async function loadGeoJson() {
     }
 
     featureCountEl.textContent = `${featureLayers.length} listed`;
-    renderFieldList(summarizeFields(features));
+    const fieldSummary = summarizeFields(features);
+    renderFieldList(fieldSummary);
+    renderToggleFieldOptions(fieldSummary);
+    renderFeatureToggleList(activeToggleFieldKey);
   } catch (error) {
     featureListEl.innerHTML = `<p class="muted">${escapeHtml(error.message)}</p>`;
     featureCountEl.textContent = "0 listed";
@@ -453,6 +564,24 @@ async function loadGeoJson() {
 searchEl.addEventListener("input", (event) => {
   filterFeatureList(event.target.value);
 });
+
+if (toggleFieldSelectEl) {
+  toggleFieldSelectEl.addEventListener("change", (event) => {
+    activeToggleFieldKey = event.target.value;
+    renderFeatureToggleList(activeToggleFieldKey);
+  });
+}
+
+if (copyToggleFieldBtnEl) {
+  copyToggleFieldBtnEl.addEventListener("click", async () => {
+    const line = `toggleFieldKey: "${activeToggleFieldKey}",`;
+    await copyText(line);
+    copyToggleFieldBtnEl.textContent = "Copied";
+    setTimeout(() => {
+      copyToggleFieldBtnEl.textContent = "Copy toggle field line";
+    }, 1200);
+  });
+}
 
 if (MAP_CENTER_INPUTS.showCenterPanel) {
   const coordsEl = document.getElementById("center-coords");
