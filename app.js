@@ -18,7 +18,7 @@ const MAP_CONFIG = {
 
   // Initial map location and zoom.
   // Format: [latitude, longitude]
-  center: [21.4780, -157.9237],
+  center: [21.4748, -157.9140],
   zoom: 11,
 
   // Tile layer style.
