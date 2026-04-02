@@ -1,0 +1,32 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Example Place A",
+        "category": "Community",
+        "description": "Replace this file with student data.",
+        "website": "example.org",
+        "email": "hello@example.org"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-157.95, 21.40]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Example Place B",
+        "category": "Education",
+        "description": "This sample helps the template run immediately.",
+        "website": "https://example.com"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-157.88, 21.50]
+      }
+    }
+  ]
+}
