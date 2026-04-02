@@ -427,7 +427,7 @@ async function loadGeoJson() {
 
     layerGroup.eachLayer((layer) => layer.addTo(map));
 
-    if (layerGroup.getLayers().length) {
+    if (MAP_CONFIG.showCenterPanel && layerGroup.getLayers().length) {
       map.fitBounds(layerGroup.getBounds(), { padding: [20, 20] });
     }
 
