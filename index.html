@@ -21,6 +21,16 @@
       <p id="feature-count" class="muted"></p>
     </section>
 
+    <section class="panel center-panel">
+      <h2>Set Map Center</h2>
+      <p class="muted">Pan and zoom to your study area, then copy the values below into <code>MAP_CONFIG</code> in <code>app.js</code>. Set <code>showCenterPanel: false</code> when done.</p>
+      <div id="center-readout">
+        <div class="center-row"><span class="center-label">Center:</span> <code id="center-coords">—</code></div>
+        <div class="center-row"><span class="center-label">Zoom:</span> <code id="center-zoom">—</code></div>
+      </div>
+      <button class="field-copy" id="copy-center-btn" type="button">Copy center &amp; zoom</button>
+    </section>
+
     <section class="panel field-panel">
       <h2>Available Fields</h2>
       <p class="muted">Auto-detected from the loaded GeoJSON properties.</p>

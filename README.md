@@ -23,7 +23,7 @@ This folder is a reusable Leaflet webmap template.
    - `dataFile` (for example `./data/my-project.geojson`)
    - `title`
    - `subtitle`
-   - `center` and `zoom`
+   - `center` and `zoom` (use the **Set Map Center** panel to find these values — see Workflow below)
 3. In `popupSections`, reorder/add/remove fields to control popup layout.
 
 ## Workflow
@@ -33,12 +33,19 @@ This folder is a reusable Leaflet webmap template.
 3. Set `MAP_CONFIG.dataFile` to your filename.
 4. Commit changes.
 5. Open your published GitHub Pages map (set up in the section below).
-6. Look at the **Available Fields** panel in the sidebar:
+6. Use the **Set Map Center** panel in the sidebar to find the right center and zoom:
+   - Pan and zoom the map until your study area is framed the way you want.
+   - Click **Copy center & zoom** — this copies two ready-to-paste lines.
+   - Back in `app.js`, replace the `center` and `zoom` values in `MAP_CONFIG` with the copied values.
+   - Set `MAP_CONFIG.showCenterPanel` to `false` to hide the panel from the final map.
+   - Commit changes.
+7. Look at the **Available Fields** panel in the sidebar:
    - It lists every property found in the GeoJSON.
    - It shows inferred data type and how many rows contain a value.
    - Click **Copy popup line** to copy a ready-to-paste line for `popupSections`.
-7. Paste copied lines into `popupSections` and reorder them as needed.
-8. Commit changes and refresh the GitHub Pages site.
+8. Paste copied lines into `popupSections` and reorder them as needed.
+9. Once your popups look correct, set `MAP_CONFIG.showFieldPanel` to `false` in `app.js` to hide the Available Fields panel from the final map.
+10. Commit changes and refresh the GitHub Pages site.
 
 ## GeoJSON notes
 
@@ -47,9 +54,7 @@ This folder is a reusable Leaflet webmap template.
 - If those fields are missing, the template uses fallback labels.
 - The template works with many different datasets and geographies, not just Hawaii.
 
-## Publish on GitHub Pages (recommended for this course)
-
-Each student can do this themselves in their own repository.
+## Publish on GitHub Pages
 
 1. Make your own repository from this template and push your changes.
 2. In your repo, open **Settings** > **Pages**.

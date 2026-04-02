@@ -49,7 +49,27 @@ const MAP_CONFIG = {
     weight: 1,
     fillColor: "#1f6f78",
     fillOpacity: 0.95
-  }
+  },
+
+  // Show the "Set Map Center" panel in the sidebar?
+  // -------------------------------------------------------
+  // STEP 1: Set this to true, then pan and zoom the map to
+  //         your study area. Copy the center and zoom values
+  //         into MAP_CONFIG.center and MAP_CONFIG.zoom above.
+  // STEP 2: Once your map is centered correctly, set this to
+  //         false so the panel does not appear on your final map.
+  // -------------------------------------------------------
+  showCenterPanel: true,
+
+  // Show the "Available Fields" panel in the sidebar?
+  // -------------------------------------------------------
+  // STEP 1: Set this to true and load your GeoJSON data.
+  //         The panel will list every property in your data
+  //         so you can build your popupSections below.
+  // STEP 2: Once your popups look right, set this to false
+  //         so the panel does not appear on your final map.
+  // -------------------------------------------------------
+  showFieldPanel: true
 };
 
 /*
@@ -109,6 +129,16 @@ const searchEl = document.getElementById("feature-search");
 mapElTitle.textContent = MAP_CONFIG.title;
 mapElSubtitle.textContent = MAP_CONFIG.subtitle;
 document.title = MAP_CONFIG.title;
+
+if (!MAP_CONFIG.showCenterPanel) {
+  const centerPanel = document.querySelector(".center-panel");
+  if (centerPanel) centerPanel.style.display = "none";
+}
+
+if (!MAP_CONFIG.showFieldPanel) {
+  const fieldPanel = document.querySelector(".field-panel");
+  if (fieldPanel) fieldPanel.style.display = "none";
+}
 
 const map = L.map("map").setView(MAP_CONFIG.center, MAP_CONFIG.zoom);
 
@@ -414,5 +444,32 @@ async function loadGeoJson() {
 searchEl.addEventListener("input", (event) => {
   filterFeatureList(event.target.value);
 });
+
+if (MAP_CONFIG.showCenterPanel) {
+  const coordsEl = document.getElementById("center-coords");
+  const zoomEl = document.getElementById("center-zoom");
+  const copyBtn = document.getElementById("copy-center-btn");
+
+  function updateCenterReadout() {
+    const c = map.getCenter();
+    const z = map.getZoom();
+    coordsEl.textContent = `[${c.lat.toFixed(4)}, ${c.lng.toFixed(4)}]`;
+    zoomEl.textContent = z;
+  }
+
+  map.on("moveend", updateCenterReadout);
+  updateCenterReadout();
+
+  copyBtn.addEventListener("click", async () => {
+    const c = map.getCenter();
+    const z = map.getZoom();
+    const text = `center: [${c.lat.toFixed(4)}, ${c.lng.toFixed(4)}],\n  zoom: ${z},`;
+    await copyText(text);
+    copyBtn.textContent = "Copied!";
+    setTimeout(() => {
+      copyBtn.textContent = "Copy center & zoom";
+    }, 1200);
+  });
+}
 
 loadGeoJson();
