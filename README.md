@@ -19,38 +19,41 @@ This folder is a reusable Leaflet webmap template.
 ## Main setup steps
 
 1. Open `app.js`.
-2. In `MAP_CONFIG`, set:
+2. In `POPUP_DATA_INPUTS`, set:
    - `dataFile` (for example `./data/my-project.geojson`)
+3. In `TITLE_INPUTS`, set:
    - `title`
    - `subtitle`
+4. In `MAP_CENTER_INPUTS`, set:
    - `center` and `zoom` (use the **Set Map Center** panel to find these values — see Workflow below)
-3. In `popupSections`, reorder/add/remove fields to control popup layout.
+5. In `POPUP_DATA_INPUTS.popupSections`, reorder/add/remove fields to control popup layout.
+6. In `COLOR_INPUTS`, adjust map colors/symbol styling.
 
 ## Workflow
 
 1. In your GitHub repo, upload your GeoJSON into `webmap-template/data/`.
 2. Edit `app.js` in the GitHub website editor.
-3. Set `MAP_CONFIG.dataFile` to your filename.
+3. Set `POPUP_DATA_INPUTS.dataFile` to your filename.
 4. Commit changes.
 5. Open your published GitHub Pages map (set up in the section below).
 6. Use the **Set Map Center** panel in the sidebar to find the right center and zoom:
    - Pan and zoom the map until your study area is framed the way you want.
    - Click **Copy center & zoom** — this copies two ready-to-paste lines.
-   - Back in `app.js`, replace the `center` and `zoom` values in `MAP_CONFIG` with the copied values.
-   - Set `MAP_CONFIG.showCenterPanel` to `false` to hide the panel from the final map.
+   - Back in `app.js`, replace the `center` and `zoom` values in `MAP_CENTER_INPUTS` with the copied values.
+   - Set `MAP_CENTER_INPUTS.showCenterPanel` to `false` to hide the panel from the final map.
    - Commit changes.
 7. Look at the **Available Fields** panel in the sidebar:
    - It lists every property found in the GeoJSON.
    - It shows inferred data type and how many rows contain a value.
    - Click **Copy popup line** to copy a ready-to-paste line for `popupSections`.
 8. Paste copied lines into `popupSections` and reorder them as needed.
-9. Once your popups look correct, set `MAP_CONFIG.showFieldPanel` to `false` in `app.js` to hide the Available Fields panel from the final map.
+9. Once your popups look correct, set `POPUP_DATA_INPUTS.showFieldPanel` to `false` in `app.js` to hide the Available Fields panel from the final map.
 10. Commit changes and refresh the GitHub Pages site.
 
 ## GeoJSON notes
 
-- Feature names in the sidebar come from `MAP_CONFIG.listNameField`.
-- Popup title comes from `MAP_CONFIG.popupTitleField`.
+- Feature names in the sidebar come from `POPUP_DATA_INPUTS.listNameField`.
+- Popup title comes from `POPUP_DATA_INPUTS.popupTitleField`.
 - If those fields are missing, the template uses fallback labels.
 - The template works with many different datasets and geographies, not just Hawaii.
 

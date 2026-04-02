@@ -1,96 +1,70 @@
 /*
   ============================================================
-  WEBMAP TEMPLATE CONFIGURATION
+  USER INPUTS: 1) CENTER THE MAP
   ============================================================
-  Edit this block first when reusing the template.
+  Keep map center values and center-panel controls together here.
 */
 
-const MAP_CONFIG = {
-  // Map title shown in the sidebar header.
+const MAP_CENTER_INPUTS = {
+  // Initial map location and zoom.
+  // Format: [latitude, longitude]
+  center: [21.478, -157.9408],
+  zoom: 11,
+
+  // Show the "Set Map Center" helper panel in the sidebar?
+  // STEP 1: Set true, then pan/zoom and copy values.
+  // STEP 2: Replace center/zoom above.
+  // STEP 3: Set false for the final map.
+  showCenterPanel: true,
+
+  // Auto-zoom to data when center setup mode is on.
+  autoFitToDataOnLoad: true,
+
+  // Decimal places shown and copied by the center helper.
+  coordinatePrecision: 4
+};
+
+/*
+  ============================================================
+  USER INPUTS: 2) TITLES
+  ============================================================
+*/
+
+const TITLE_INPUTS = {
+  // Map title shown in the sidebar header and browser tab.
   title: "My GeoJSON Webmap",
 
   // Optional subtitle text under the title.
-  subtitle: "Edit app.js to change this text, popup fields, and data source.",
+  subtitle: "Edit app.js to change this text, popup fields, and data source."
+};
 
-  // Relative path to a GeoJSON file INSIDE webmap-template/data/.
-  // Place each student's file in webmap-template/data/ and update this value.
+/*
+  ============================================================
+  USER INPUTS: 3) POPUP DATA
+  ============================================================
+*/
+
+const POPUP_DATA_INPUTS = {
+  // Relative path to a GeoJSON file in /data.
   dataFile: "./data/your-data.geojson",
 
-  // Initial map location and zoom.
-  // Format: [latitude, longitude]
-  center: [21.4748, -157.9140],
-  zoom: 11,
-
-  // Tile layer style.
-  tileUrl: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-  tileAttribution: "&copy; OpenStreetMap contributors &copy; CARTO",
-
   // Which GeoJSON property should be used as the feature display name.
-  // If this property is missing in some features, the template falls back to
-  // "Feature N" labels.
+  // If missing, the template falls back to "Feature N" labels.
   listNameField: "OrgName",
 
   // Property used as the popup title.
   popupTitleField: "OrgName",
 
-  // Styling for polygons/lines.
-  featureStyle: {
-    color: "#1f6f78",
-    weight: 2,
-    opacity: 0.85,
-    fillColor: "#2f8b77",
-    fillOpacity: 0.3
-  },
+  // Show the "Available Fields" helper panel in the sidebar?
+  // STEP 1: Set true while building popup sections.
+  // STEP 2: Set false for the final map.
+  showFieldPanel: true,
 
-  // Point symbols for Point/MultiPoint geometries.
-  pointStyle: {
-    radius: 6,
-    color: "#ffffff",
-    weight: 1,
-    fillColor: "#1f6f78",
-    fillOpacity: 0.95
-  },
-
-  // Show the "Set Map Center" panel in the sidebar?
-  // -------------------------------------------------------
-  // STEP 1: Set this to true, then pan and zoom the map to
-  //         your study area. Copy the center and zoom values
-  //         into MAP_CONFIG.center and MAP_CONFIG.zoom above.
-  // STEP 2: Once your map is centered correctly, set this to
-  //         false so the panel does not appear on your final map.
-  // -------------------------------------------------------
-  showCenterPanel: true,
-
-  // Show the "Available Fields" panel in the sidebar?
-  // -------------------------------------------------------
-  // STEP 1: Set this to true and load your GeoJSON data.
-  //         The panel will list every property in your data
-  //         so you can build your popupSections below.
-  // STEP 2: Once your popups look right, set this to false
-  //         so the panel does not appear on your final map.
-  // -------------------------------------------------------
-  showFieldPanel: true
-};
-
-/*
-  ============================================================
-  POPUP LAYOUT CONFIGURATION
-  ============================================================
-  This is the main area where users decide where fields appear in the popup.
-
-  How it works:
-  - Each object in popupSections creates a section heading in the popup.
-  - Inside each section, fields are rendered in the listed order.
-  - If showWhenEmpty is false, missing/blank values are hidden.
-
-  To add a field:
-  - Add { key: "YourGeoJsonProperty", label: "Label to show" }
-
-  To move a field:
-  - Move that line higher/lower in the array.
-*/
-
-const popupSections = [
+  // Popup section layout.
+  // - Each section becomes a heading in the popup.
+  // - Fields render in listed order.
+  // - If showWhenEmpty is false, blank values are hidden.
+  popupSections: [
   {
     heading: "Contact",
     showWhenEmpty: false,
@@ -109,7 +83,38 @@ const popupSections = [
       { key: "District", label: "District" }
     ]
   }
-];
+  ]
+};
+
+/*
+  ============================================================
+  USER INPUTS: 4) COLORS
+  ============================================================
+*/
+
+const COLOR_INPUTS = {
+  // Basemap tiles.
+  tileUrl: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+  tileAttribution: "&copy; OpenStreetMap contributors &copy; CARTO",
+
+  // Styling for polygons/lines.
+  featureStyle: {
+    color: "#1f6f78",
+    weight: 2,
+    opacity: 0.85,
+    fillColor: "#2f8b77",
+    fillOpacity: 0.3
+  },
+
+  // Point symbols for Point/MultiPoint geometries.
+  pointStyle: {
+    radius: 6,
+    color: "#ffffff",
+    weight: 1,
+    fillColor: "#1f6f78",
+    fillOpacity: 0.95
+  }
+};
 
 /*
   ============================================================
@@ -126,24 +131,24 @@ const fieldListEl = document.getElementById("field-list");
 const fieldCountEl = document.getElementById("field-count");
 const searchEl = document.getElementById("feature-search");
 
-mapElTitle.textContent = MAP_CONFIG.title;
-mapElSubtitle.textContent = MAP_CONFIG.subtitle;
-document.title = MAP_CONFIG.title;
+mapElTitle.textContent = TITLE_INPUTS.title;
+mapElSubtitle.textContent = TITLE_INPUTS.subtitle;
+document.title = TITLE_INPUTS.title;
 
-if (!MAP_CONFIG.showCenterPanel) {
+if (!MAP_CENTER_INPUTS.showCenterPanel) {
   const centerPanel = document.querySelector(".center-panel");
   if (centerPanel) centerPanel.style.display = "none";
 }
 
-if (!MAP_CONFIG.showFieldPanel) {
+if (!POPUP_DATA_INPUTS.showFieldPanel) {
   const fieldPanel = document.querySelector(".field-panel");
   if (fieldPanel) fieldPanel.style.display = "none";
 }
 
-const map = L.map("map").setView(MAP_CONFIG.center, MAP_CONFIG.zoom);
+const map = L.map("map").setView(MAP_CENTER_INPUTS.center, MAP_CENTER_INPUTS.zoom);
 
-L.tileLayer(MAP_CONFIG.tileUrl, {
-  attribution: MAP_CONFIG.tileAttribution,
+L.tileLayer(COLOR_INPUTS.tileUrl, {
+  attribution: COLOR_INPUTS.tileAttribution,
   maxZoom: 20
 }).addTo(map);
 
@@ -190,11 +195,11 @@ function formatFieldValue(rawValue, field) {
 }
 
 function buildPopupHtml(properties) {
-  const popupTitle = asDisplayValue(properties[MAP_CONFIG.popupTitleField]) || "Feature";
+  const popupTitle = asDisplayValue(properties[POPUP_DATA_INPUTS.popupTitleField]) || "Feature";
 
   let html = `<h3 class="popup-title">${escapeHtml(popupTitle)}</h3>`;
 
-  popupSections.forEach((section) => {
+  POPUP_DATA_INPUTS.popupSections.forEach((section) => {
     const rows = section.fields
       .map((field) => {
         const rendered = formatFieldValue(properties[field.key], field);
@@ -218,7 +223,7 @@ function buildPopupHtml(properties) {
 }
 
 function getFeatureLabel(feature, index) {
-  const val = feature.properties?.[MAP_CONFIG.listNameField];
+  const val = feature.properties?.[POPUP_DATA_INPUTS.listNameField];
   const clean = asDisplayValue(val);
   return clean || `Feature ${index + 1}`;
 }
@@ -263,11 +268,11 @@ function addFeatureToList(featureLayer, label) {
 }
 
 function styleFeature() {
-  return MAP_CONFIG.featureStyle;
+  return COLOR_INPUTS.featureStyle;
 }
 
 function pointToLayer(_feature, latlng) {
-  return L.circleMarker(latlng, MAP_CONFIG.pointStyle);
+  return L.circleMarker(latlng, COLOR_INPUTS.pointStyle);
 }
 
 function normalizeFeatures(geojson) {
@@ -404,9 +409,9 @@ function renderFieldList(fieldSummary) {
 
 async function loadGeoJson() {
   try {
-    const response = await fetch(MAP_CONFIG.dataFile);
+    const response = await fetch(POPUP_DATA_INPUTS.dataFile);
     if (!response.ok) {
-      throw new Error(`Could not load ${MAP_CONFIG.dataFile} (${response.status})`);
+      throw new Error(`Could not load ${POPUP_DATA_INPUTS.dataFile} (${response.status})`);
     }
 
     const geojson = await response.json();
@@ -427,7 +432,11 @@ async function loadGeoJson() {
 
     layerGroup.eachLayer((layer) => layer.addTo(map));
 
-    if (MAP_CONFIG.showCenterPanel && layerGroup.getLayers().length) {
+    if (
+      MAP_CENTER_INPUTS.showCenterPanel &&
+      MAP_CENTER_INPUTS.autoFitToDataOnLoad &&
+      layerGroup.getLayers().length
+    ) {
       map.fitBounds(layerGroup.getBounds(), { padding: [20, 20] });
     }
 
@@ -445,7 +454,7 @@ searchEl.addEventListener("input", (event) => {
   filterFeatureList(event.target.value);
 });
 
-if (MAP_CONFIG.showCenterPanel) {
+if (MAP_CENTER_INPUTS.showCenterPanel) {
   const coordsEl = document.getElementById("center-coords");
   const zoomEl = document.getElementById("center-zoom");
   const copyBtn = document.getElementById("copy-center-btn");
@@ -453,7 +462,8 @@ if (MAP_CONFIG.showCenterPanel) {
   function updateCenterReadout() {
     const c = map.getCenter();
     const z = map.getZoom();
-    coordsEl.textContent = `[${c.lat.toFixed(4)}, ${c.lng.toFixed(4)}]`;
+    const p = MAP_CENTER_INPUTS.coordinatePrecision;
+    coordsEl.textContent = `[${c.lat.toFixed(p)}, ${c.lng.toFixed(p)}]`;
     zoomEl.textContent = z;
   }
 
@@ -463,7 +473,8 @@ if (MAP_CONFIG.showCenterPanel) {
   copyBtn.addEventListener("click", async () => {
     const c = map.getCenter();
     const z = map.getZoom();
-    const text = `center: [${c.lat.toFixed(4)}, ${c.lng.toFixed(4)}],\n  zoom: ${z},`;
+    const p = MAP_CENTER_INPUTS.coordinatePrecision;
+    const text = `center: [${c.lat.toFixed(p)}, ${c.lng.toFixed(p)}],\n  zoom: ${z},`;
     await copyText(text);
     copyBtn.textContent = "Copied!";
     setTimeout(() => {

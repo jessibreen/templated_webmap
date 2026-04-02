@@ -6,7 +6,7 @@
       "properties": {
         "name": "Example Place A",
         "category": "Community",
-        "description": "Replace this file with student data.",
+        "description": "Replace this file with user data.",
         "website": "example.org",
         "email": "hello@example.org"
       },
