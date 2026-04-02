@@ -14,11 +14,27 @@ This folder is a reusable Leaflet webmap template.
 
 - `index.html`: app shell
 - `styles.css`: visual styling
-- `app.js`: configuration + logic (heavily commented)
+- `map-settings.js`: configuration + logic (heavily commented)
+
+## After copying this template: publish first
+
+Set up GitHub Pages before doing map customization so you can test changes live.
+
+1. Click **Use this template** on GitHub and create your own repository.
+2. In your new repo, open **Settings** > **Pages**.
+3. Under **Build and deployment**, set:
+   - **Source**: Deploy from a branch
+   - **Branch**: `main` (or your default branch)
+   - **Folder**: `/ (root)`
+4. Click **Save**.
+5. Wait for the "Your site is live" message, then open the Pages URL.
+6. Keep that published map page open while you edit `map-settings.js` in another tab.
+
+This template is designed for that two-tab workflow (published map + `map-settings.js`).
 
 ## Main setup steps
 
-1. Open `app.js`.
+1. Open `map-settings.js`.
 2. In `POPUP_DATA_INPUTS`, set:
    - `dataFile` (for example `./data/my-project.geojson`)
 3. In `TITLE_INPUTS`, set:
@@ -31,24 +47,33 @@ This folder is a reusable Leaflet webmap template.
 
 ## Workflow
 
-1. In your GitHub repo, upload your GeoJSON into `webmap-template/data/`.
-2. Edit `app.js` in the GitHub website editor.
+1. In your GitHub repo, upload your GeoJSON into `data/`.
+2. Open two tabs and keep both open while you configure the map:
+   - `map-settings.js` in the GitHub website editor
+   - your published map page
 3. Set `POPUP_DATA_INPUTS.dataFile` to your filename.
 4. Commit changes.
-5. Open your published GitHub Pages map (set up in the section below).
-6. Use the **Set Map Center** panel in the sidebar to find the right center and zoom:
+5. Refresh the published map page.
+6. **Setup phase: Set Map Center**
    - Pan and zoom the map until your study area is framed the way you want.
    - Click **Copy center & zoom** — this copies two ready-to-paste lines.
-   - Back in `app.js`, replace the `center` and `zoom` values in `MAP_CENTER_INPUTS` with the copied values.
-   - Set `MAP_CENTER_INPUTS.showCenterPanel` to `false` to hide the panel from the final map.
-   - Commit changes.
-7. Look at the **Available Fields** panel in the sidebar:
-   - It lists every property found in the GeoJSON.
-   - It shows inferred data type and how many rows contain a value.
-   - Click **Copy popup line** to copy a ready-to-paste line for `popupSections`.
-8. Paste copied lines into `popupSections` and reorder them as needed.
-9. Once your popups look correct, set `POPUP_DATA_INPUTS.showFieldPanel` to `false` in `app.js` to hide the Available Fields panel from the final map.
-10. Commit changes and refresh the GitHub Pages site.
+   - Back in `map-settings.js`, replace the `center` and `zoom` values in `MAP_CENTER_INPUTS` with the copied values.
+   - Commit in GitHub and refresh the published map page.
+   - Final map step: set `MAP_CENTER_INPUTS.showCenterPanel` to `false` when centering is done.
+7. **Setup phase: Layer Toggle Field**
+   - In the map sidebar, choose a grouping field in **Layer Toggle Field**.
+   - Click **Copy toggle field line** and paste it into `LAYER_TOGGLE_INPUTS.toggleFieldKey` in `map-settings.js`.
+   - Commit in GitHub and refresh the published map page.
+   - Final map step: set `LAYER_TOGGLE_INPUTS.showLayerTogglePanel` to `false` when this helper is no longer needed.
+8. **Setup phase: Available Fields / Popup Data**
+   - Use **Available Fields** to review properties and click **Copy popup line** for fields you want.
+   - Paste copied lines into `POPUP_DATA_INPUTS.popupSections` and reorder them as needed.
+   - Commit in GitHub and refresh the published map page.
+   - Final map step: set `POPUP_DATA_INPUTS.showFieldPanel` to `false` when popup setup is complete.
+9. Final checks:
+   - Confirm your map opens with the right center/zoom.
+   - Confirm toggles and popups behave as expected.
+   - Keep helper panels off for the final published view.
 
 ## GeoJSON notes
 
@@ -59,23 +84,17 @@ This folder is a reusable Leaflet webmap template.
 
 ## Publish on GitHub Pages
 
-1. Make your own repository from this template and push your changes.
-2. In your repo, open **Settings** > **Pages**.
-3. Under **Build and deployment**, set:
-   - **Source**: Deploy from a branch
-   - **Branch**: `main` (or your default branch)
-   - **Folder**: `/ (root)`
-4. Click **Save**.
-5. Wait for the "Your site is live" message and open the URL shown there.
-6. After each commit, refresh the site to see updates.
+If you skipped the publish-first section above, complete those steps before map setup.
+
+After Pages is enabled, refresh the site after each commit to see updates.
 
 ### Important note about folders
 
 GitHub Pages branch deployment supports only `/ (root)` or `/docs`.
-If your site files are currently inside `webmap-template/`, do one of these:
+If your site files are inside a subfolder, do one of these:
 
-- Move the contents of `webmap-template/` to the repository root.
-- Or move the contents of `webmap-template/` into a `docs/` folder and publish from `/docs`.
+- Move site files to the repository root.
+- Or move site files into a `docs/` folder and publish from `/docs`.
 
 ### If Pages is blocked or not visible
 
