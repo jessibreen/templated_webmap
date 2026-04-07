@@ -166,7 +166,13 @@ const COLOR_INPUTS = {
     weight: 1,
     fillColor: "#1f6f78",
     fillOpacity: 0.95
-  }
+  },
+
+  // Show the "Color Settings" helper panel in the sidebar?
+  // STEP 1: Set true while adjusting colors (map updates live).
+  // STEP 2: Click "Copy color settings", paste into featureStyle/pointStyle above.
+  // STEP 3: Set false for the final map.
+  showColorPanel: true
 };
 
 /*
@@ -203,6 +209,11 @@ if (!POPUP_DATA_INPUTS.showFieldPanel) {
 if (!LAYER_TOGGLE_INPUTS.showLayerTogglePanel) {
   const layerTogglePanel = document.querySelector(".layer-toggle-panel");
   if (layerTogglePanel) layerTogglePanel.style.display = "none";
+}
+
+if (!COLOR_INPUTS.showColorPanel) {
+  const colorToolPanel = document.querySelector(".color-tool-panel");
+  if (colorToolPanel) colorToolPanel.style.display = "none";
 }
 
 const map = L.map("map").setView(MAP_CENTER_INPUTS.center, MAP_CENTER_INPUTS.zoom);
@@ -650,3 +661,87 @@ if (MAP_CENTER_INPUTS.showCenterPanel) {
 }
 
 loadGeoJson();
+
+if (COLOR_INPUTS.showColorPanel) {
+  const workingFeatureStyle = Object.assign({}, COLOR_INPUTS.featureStyle);
+  const workingPointStyle = Object.assign({}, COLOR_INPUTS.pointStyle);
+
+  function applyFeatureStyle() {
+    featureLayers.forEach((layer) => {
+      if (!(layer instanceof L.CircleMarker)) {
+        layer.setStyle(workingFeatureStyle);
+      }
+    });
+  }
+
+  function applyPointStyle() {
+    featureLayers.forEach((layer) => {
+      if (layer instanceof L.CircleMarker) {
+        layer.setStyle(workingPointStyle);
+      }
+    });
+  }
+
+  function bindColorInput(id, styleObj, key, applyFn) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = styleObj[key];
+    el.addEventListener("input", () => {
+      styleObj[key] = el.value;
+      applyFn();
+    });
+  }
+
+  function bindRangeInput(id, valId, styleObj, key, applyFn) {
+    const el = document.getElementById(id);
+    const valEl = document.getElementById(valId);
+    if (!el) return;
+    el.value = styleObj[key];
+    if (valEl) valEl.textContent = styleObj[key];
+    el.addEventListener("input", () => {
+      styleObj[key] = parseFloat(el.value);
+      if (valEl) valEl.textContent = el.value;
+      applyFn();
+    });
+  }
+
+  bindColorInput("feat-stroke-color", workingFeatureStyle, "color", applyFeatureStyle);
+  bindColorInput("feat-fill-color", workingFeatureStyle, "fillColor", applyFeatureStyle);
+  bindRangeInput("feat-fill-opacity", "feat-fill-opacity-val", workingFeatureStyle, "fillOpacity", applyFeatureStyle);
+  bindRangeInput("feat-opacity", "feat-opacity-val", workingFeatureStyle, "opacity", applyFeatureStyle);
+  bindRangeInput("feat-weight", "feat-weight-val", workingFeatureStyle, "weight", applyFeatureStyle);
+
+  bindColorInput("pt-fill-color", workingPointStyle, "fillColor", applyPointStyle);
+  bindColorInput("pt-stroke-color", workingPointStyle, "color", applyPointStyle);
+  bindRangeInput("pt-fill-opacity", "pt-fill-opacity-val", workingPointStyle, "fillOpacity", applyPointStyle);
+  bindRangeInput("pt-weight", "pt-weight-val", workingPointStyle, "weight", applyPointStyle);
+  bindRangeInput("pt-radius", "pt-radius-val", workingPointStyle, "radius", applyPointStyle);
+
+  const copyColorBtnEl = document.getElementById("copy-color-btn");
+  if (copyColorBtnEl) {
+    copyColorBtnEl.addEventListener("click", async () => {
+      const n = (v) => String(parseFloat(v.toFixed(4)));
+      const text = [
+        `  featureStyle: {`,
+        `    color: "${workingFeatureStyle.color}",`,
+        `    weight: ${n(workingFeatureStyle.weight)},`,
+        `    opacity: ${n(workingFeatureStyle.opacity)},`,
+        `    fillColor: "${workingFeatureStyle.fillColor}",`,
+        `    fillOpacity: ${n(workingFeatureStyle.fillOpacity)}`,
+        `  },`,
+        `  pointStyle: {`,
+        `    radius: ${n(workingPointStyle.radius)},`,
+        `    color: "${workingPointStyle.color}",`,
+        `    weight: ${n(workingPointStyle.weight)},`,
+        `    fillColor: "${workingPointStyle.fillColor}",`,
+        `    fillOpacity: ${n(workingPointStyle.fillOpacity)}`,
+        `  }`
+      ].join("\n");
+      await copyText(text);
+      copyColorBtnEl.textContent = "Copied!";
+      setTimeout(() => {
+        copyColorBtnEl.textContent = "Copy color settings";
+      }, 1200);
+    });
+  }
+}

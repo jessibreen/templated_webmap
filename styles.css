@@ -66,6 +66,59 @@ body {
   flex: none;
 }
 
+.color-group {
+  border: 1px solid #e2efef;
+  border-radius: 6px;
+  background: #f9fcfc;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.color-group-label {
+  font-weight: 700;
+  color: #1f4852;
+  font-size: 0.85rem;
+  padding-bottom: 5px;
+  border-bottom: 1px dashed #dceaea;
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-label {
+  font-size: 0.82rem;
+  color: #5d7479;
+  flex: 1;
+}
+
+.color-row input[type="color"] {
+  width: 36px;
+  height: 26px;
+  border: 1px solid #c8dcdc;
+  border-radius: 4px;
+  padding: 1px 2px;
+  cursor: pointer;
+  background: none;
+}
+
+.color-row input[type="range"] {
+  flex: 1;
+  cursor: pointer;
+  accent-color: #1f6f78;
+}
+
+.color-val {
+  font-size: 0.8rem;
+  color: #5d7479;
+  min-width: 28px;
+  text-align: right;
+}
+
 .panel h2 {
   margin: 0;
   font-size: 0.98rem;
