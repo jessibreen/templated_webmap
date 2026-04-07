@@ -150,27 +150,38 @@ const COLOR_INPUTS = {
   tileUrl: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
   tileAttribution: "&copy; OpenStreetMap contributors &copy; CARTO",
 
-  // Styling for polygons/lines.
-  featureStyle: {
-    color: "#1f6f78",
-    weight: 2,
-    opacity: 0.85,
-    fillColor: "#2f8b77",
-    fillOpacity: 0.3
-  },
+  // Which color scheme to apply on load.
+  // Built-in options: "teal" | "warm" | "slate" | "forest" | "berry"
+  // Use "custom" to apply the hex values you define in customScheme below.
+  colorScheme: "teal",
 
-  // Point symbols for Point/MultiPoint geometries.
-  pointStyle: {
-    radius: 6,
-    color: "#ffffff",
-    weight: 1,
-    fillColor: "#1f6f78",
-    fillOpacity: 0.95
+  // ------------------------------------------------------------------
+  // YOUR CUSTOM COLORS
+  // Only used when colorScheme is "custom" above.
+  // Replace these hex values with your own choices.
+  // ------------------------------------------------------------------
+  customScheme: {
+    // Polygons and lines.
+    featureStyle: {
+      color:       "#1f6f78",  // stroke color
+      weight:      2,          // stroke width in pixels
+      opacity:     0.85,       // stroke opacity (0–1)
+      fillColor:   "#2f8b77",  // fill color
+      fillOpacity: 0.3         // fill opacity (0–1)
+    },
+    // Point features (circle markers).
+    pointStyle: {
+      radius:      6,          // circle radius in pixels
+      color:       "#ffffff",  // stroke color
+      weight:      1,          // stroke width in pixels
+      fillColor:   "#1f6f78",  // fill color
+      fillOpacity: 0.95        // fill opacity (0–1)
+    }
   },
 
   // Show the "Color Settings" helper panel in the sidebar?
-  // STEP 1: Set true while adjusting colors (map updates live).
-  // STEP 2: Click "Copy color settings", paste into featureStyle/pointStyle above.
+  // STEP 1: Set true, pick a scheme (map updates live).
+  // STEP 2: Note the scheme name (or set colorScheme to "custom" and edit customScheme).
   // STEP 3: Set false for the final map.
   showColorPanel: true
 };
@@ -423,12 +434,53 @@ function renderToggleFieldOptions(fieldSummary) {
   toggleFieldSelectEl.value = activeToggleFieldKey;
 }
 
+const COLOR_PRESETS = {
+  teal:   {
+    label: "Teal",
+    featureStyle: { color: "#1f6f78", weight: 2, opacity: 0.85, fillColor: "#2f8b77", fillOpacity: 0.3  },
+    pointStyle:   { radius: 6, color: "#ffffff", weight: 1,     fillColor: "#1f6f78", fillOpacity: 0.95 }
+  },
+  warm:   {
+    label: "Warm",
+    featureStyle: { color: "#b84a1e", weight: 2, opacity: 0.85, fillColor: "#e07840", fillOpacity: 0.3  },
+    pointStyle:   { radius: 6, color: "#ffffff", weight: 1,     fillColor: "#c95c22", fillOpacity: 0.95 }
+  },
+  slate:  {
+    label: "Slate",
+    featureStyle: { color: "#3d5a70", weight: 2, opacity: 0.85, fillColor: "#6b8fa8", fillOpacity: 0.3  },
+    pointStyle:   { radius: 6, color: "#ffffff", weight: 1,     fillColor: "#3d5a70", fillOpacity: 0.95 }
+  },
+  forest: {
+    label: "Forest",
+    featureStyle: { color: "#2d5a27", weight: 2, opacity: 0.85, fillColor: "#4a8c3f", fillOpacity: 0.3  },
+    pointStyle:   { radius: 6, color: "#ffffff", weight: 1,     fillColor: "#2d5a27", fillOpacity: 0.95 }
+  },
+  berry:  {
+    label: "Berry",
+    featureStyle: { color: "#6b2d6b", weight: 2, opacity: 0.85, fillColor: "#9b5c9b", fillOpacity: 0.3  },
+    pointStyle:   { radius: 6, color: "#ffffff", weight: 1,     fillColor: "#6b2d6b", fillOpacity: 0.95 }
+  },
+  custom: {
+    label: "Custom"
+    // featureStyle and pointStyle are read from COLOR_INPUTS.customScheme.
+  }
+};
+
+let activeColorScheme = COLOR_INPUTS.colorScheme in COLOR_PRESETS
+  ? COLOR_INPUTS.colorScheme
+  : "teal";
+
+function getActiveScheme() {
+  if (activeColorScheme === "custom") return COLOR_INPUTS.customScheme;
+  return COLOR_PRESETS[activeColorScheme];
+}
+
 function styleFeature() {
-  return COLOR_INPUTS.featureStyle;
+  return getActiveScheme().featureStyle;
 }
 
 function pointToLayer(_feature, latlng) {
-  return L.circleMarker(latlng, COLOR_INPUTS.pointStyle);
+  return L.circleMarker(latlng, getActiveScheme().pointStyle);
 }
 
 function normalizeFeatures(geojson) {
@@ -663,86 +715,49 @@ if (MAP_CENTER_INPUTS.showCenterPanel) {
 loadGeoJson();
 
 if (COLOR_INPUTS.showColorPanel) {
-  const workingFeatureStyle = Object.assign({}, COLOR_INPUTS.featureStyle);
-  const workingPointStyle = Object.assign({}, COLOR_INPUTS.pointStyle);
+  const schemeListEl = document.getElementById("color-scheme-list");
 
-  function applyFeatureStyle() {
-    featureLayers.forEach((layer) => {
-      if (!(layer instanceof L.CircleMarker)) {
-        layer.setStyle(workingFeatureStyle);
-      }
-    });
-  }
-
-  function applyPointStyle() {
+  function applyActiveScheme() {
+    const scheme = getActiveScheme();
     featureLayers.forEach((layer) => {
       if (layer instanceof L.CircleMarker) {
-        layer.setStyle(workingPointStyle);
-        layer.setRadius(workingPointStyle.radius);
+        layer.setStyle(scheme.pointStyle);
+        layer.setRadius(scheme.pointStyle.radius);
+      } else {
+        layer.setStyle(scheme.featureStyle);
       }
     });
   }
 
-  function bindColorInput(id, styleObj, key, applyFn) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.value = styleObj[key];
-    el.addEventListener("input", () => {
-      styleObj[key] = el.value;
-      applyFn();
+  Object.entries(COLOR_PRESETS).forEach(([key, preset]) => {
+    const label = document.createElement("label");
+    label.className = "scheme-item";
+
+    const radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = "color-scheme";
+    radio.value = key;
+    radio.checked = activeColorScheme === key;
+    radio.addEventListener("change", () => {
+      activeColorScheme = key;
+      applyActiveScheme();
     });
-  }
 
-  function bindRangeInput(id, valId, styleObj, key, applyFn) {
-    const el = document.getElementById(id);
-    const valEl = document.getElementById(valId);
-    if (!el) return;
-    el.value = styleObj[key];
-    if (valEl) valEl.textContent = styleObj[key];
-    el.addEventListener("input", () => {
-      styleObj[key] = parseFloat(el.value);
-      if (valEl) valEl.textContent = el.value;
-      applyFn();
-    });
-  }
+    const swatch = document.createElement("span");
+    swatch.className = "scheme-swatch";
+    swatch.style.background = key === "custom"
+      ? COLOR_INPUTS.customScheme.pointStyle.fillColor
+      : preset.pointStyle.fillColor;
 
-  bindColorInput("feat-stroke-color", workingFeatureStyle, "color", applyFeatureStyle);
-  bindColorInput("feat-fill-color", workingFeatureStyle, "fillColor", applyFeatureStyle);
-  bindRangeInput("feat-fill-opacity", "feat-fill-opacity-val", workingFeatureStyle, "fillOpacity", applyFeatureStyle);
-  bindRangeInput("feat-opacity", "feat-opacity-val", workingFeatureStyle, "opacity", applyFeatureStyle);
-  bindRangeInput("feat-weight", "feat-weight-val", workingFeatureStyle, "weight", applyFeatureStyle);
+    const text = document.createElement("span");
+    text.textContent = preset.label;
+    if (key === "custom") {
+      text.textContent += " (from map-settings.js)";
+    }
 
-  bindColorInput("pt-fill-color", workingPointStyle, "fillColor", applyPointStyle);
-  bindColorInput("pt-stroke-color", workingPointStyle, "color", applyPointStyle);
-  bindRangeInput("pt-fill-opacity", "pt-fill-opacity-val", workingPointStyle, "fillOpacity", applyPointStyle);
-  bindRangeInput("pt-weight", "pt-weight-val", workingPointStyle, "weight", applyPointStyle);
-  bindRangeInput("pt-radius", "pt-radius-val", workingPointStyle, "radius", applyPointStyle);
-
-  const copyColorBtnEl = document.getElementById("copy-color-btn");
-  if (copyColorBtnEl) {
-    copyColorBtnEl.addEventListener("click", async () => {
-      const n = (v) => String(parseFloat(v.toFixed(4)));
-      const text = [
-        `  featureStyle: {`,
-        `    color: "${workingFeatureStyle.color}",`,
-        `    weight: ${n(workingFeatureStyle.weight)},`,
-        `    opacity: ${n(workingFeatureStyle.opacity)},`,
-        `    fillColor: "${workingFeatureStyle.fillColor}",`,
-        `    fillOpacity: ${n(workingFeatureStyle.fillOpacity)}`,
-        `  },`,
-        `  pointStyle: {`,
-        `    radius: ${n(workingPointStyle.radius)},`,
-        `    color: "${workingPointStyle.color}",`,
-        `    weight: ${n(workingPointStyle.weight)},`,
-        `    fillColor: "${workingPointStyle.fillColor}",`,
-        `    fillOpacity: ${n(workingPointStyle.fillOpacity)}`,
-        `  }`
-      ].join("\n");
-      await copyText(text);
-      copyColorBtnEl.textContent = "Copied!";
-      setTimeout(() => {
-        copyColorBtnEl.textContent = "Copy color settings";
-      }, 1200);
-    });
-  }
+    label.appendChild(radio);
+    label.appendChild(swatch);
+    label.appendChild(text);
+    schemeListEl.appendChild(label);
+  });
 }

@@ -50,63 +50,9 @@
 
     <section class="panel color-tool-panel">
       <h2>Color Settings</h2>
-      <p class="muted">Setup mode: adjust colors and styles below. The map updates live. When done, click <code>Copy color settings</code>, paste the values into <code>featureStyle</code> and <code>pointStyle</code> in <code>COLOR_INPUTS</code>, then set <code>showColorPanel: false</code>.</p>
-
-      <div class="color-group">
-        <div class="color-group-label">Features (polygons &amp; lines)</div>
-        <div class="color-row">
-          <label class="color-label" for="feat-stroke-color">Stroke color</label>
-          <input type="color" id="feat-stroke-color" aria-label="Feature stroke color">
-        </div>
-        <div class="color-row">
-          <label class="color-label" for="feat-fill-color">Fill color</label>
-          <input type="color" id="feat-fill-color" aria-label="Feature fill color">
-        </div>
-        <div class="color-row">
-          <label class="color-label" for="feat-fill-opacity">Fill opacity</label>
-          <input type="range" id="feat-fill-opacity" min="0" max="1" step="0.05" aria-label="Feature fill opacity">
-          <span class="color-val" id="feat-fill-opacity-val"></span>
-        </div>
-        <div class="color-row">
-          <label class="color-label" for="feat-opacity">Stroke opacity</label>
-          <input type="range" id="feat-opacity" min="0" max="1" step="0.05" aria-label="Feature stroke opacity">
-          <span class="color-val" id="feat-opacity-val"></span>
-        </div>
-        <div class="color-row">
-          <label class="color-label" for="feat-weight">Weight</label>
-          <input type="range" id="feat-weight" min="0" max="10" step="0.5" aria-label="Feature stroke weight">
-          <span class="color-val" id="feat-weight-val"></span>
-        </div>
-      </div>
-
-      <div class="color-group">
-        <div class="color-group-label">Points</div>
-        <div class="color-row">
-          <label class="color-label" for="pt-fill-color">Fill color</label>
-          <input type="color" id="pt-fill-color" aria-label="Point fill color">
-        </div>
-        <div class="color-row">
-          <label class="color-label" for="pt-stroke-color">Stroke color</label>
-          <input type="color" id="pt-stroke-color" aria-label="Point stroke color">
-        </div>
-        <div class="color-row">
-          <label class="color-label" for="pt-fill-opacity">Fill opacity</label>
-          <input type="range" id="pt-fill-opacity" min="0" max="1" step="0.05" aria-label="Point fill opacity">
-          <span class="color-val" id="pt-fill-opacity-val"></span>
-        </div>
-        <div class="color-row">
-          <label class="color-label" for="pt-weight">Stroke weight</label>
-          <input type="range" id="pt-weight" min="0" max="10" step="0.5" aria-label="Point stroke weight">
-          <span class="color-val" id="pt-weight-val"></span>
-        </div>
-        <div class="color-row">
-          <label class="color-label" for="pt-radius">Radius</label>
-          <input type="range" id="pt-radius" min="2" max="20" step="1" aria-label="Point radius">
-          <span class="color-val" id="pt-radius-val"></span>
-        </div>
-      </div>
-
-      <button class="field-copy" id="copy-color-btn" type="button">Copy color settings</button>
+      <p class="muted">Setup mode: pick a scheme below — the map updates live. When done, set <code>COLOR_INPUTS.colorScheme</code> to your chosen name in <code>map-settings.js</code> and set <code>showColorPanel: false</code>.</p>
+      <p class="muted">To use your own colors, choose <code>Custom</code> and edit the <code>customScheme</code> block in <code>map-settings.js</code>.</p>
+      <div id="color-scheme-list" role="radiogroup" aria-label="Color scheme"></div>
     </section>
   </aside>
 
