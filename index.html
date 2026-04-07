@@ -16,13 +16,17 @@
 
     <section class="panel setup-status-panel">
       <p class="setup-status-title">Setup in progress:</p>
+      <p class="muted">Setup mode: keep this published map page and <code>map-settings.js</code> open in two tabs.</p>
+      <p class="muted">Choose your map settings here and then cut&paste them into map-settings.js to make them permanent.</p>
+      <p class="muted">As you complete each step, check it off in <code>map-settings.js</code>,</p>
+      <p class="muted">When you're done, save the changes to map-settings.js, and refresh this page to see the final map.</p>
       <ul id="setup-status-list" class="setup-status-list"></ul>
     </section>
 
     <section class="panel center-panel">
       <h2><span class="setup-badge">🔧</span> Set Map Center</h2>
-      <p class="muted">Setup mode: keep this published map page and <code>map-settings.js</code> open in two tabs. Pan/zoom here, then paste values there.</p>
-      <p class="muted">Use <code>Copy center &amp; zoom</code>, paste into <code>MAP_CENTER_INPUTS.center</code> and <code>MAP_CENTER_INPUTS.zoom</code>, commit in GitHub, then refresh this page.</p>
+      
+      <p class="muted">Pan and zoom to center the map as you want it. Then use the "Copy center & zoom" button to copy that information so you can paste it into map-settings.js. Use <code>Copy center &amp; zoom</code>, paste into <code>MAP_CENTER_INPUTS.center</code> and <code>MAP_CENTER_INPUTS.zoom</code>, commit in GitHub, then refresh this page.</p>
       <p class="muted">When your center is final, set <code>MAP_CENTER_INPUTS.showCenterPanel</code> to <code>false</code> in <code>map-settings.js</code>.</p>
       <div id="center-readout">
         <div class="center-row"><span class="center-label">Center:</span> <code id="center-coords">—</code></div>
