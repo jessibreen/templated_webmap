@@ -141,7 +141,67 @@ const LAYER_TOGGLE_INPUTS = {
 
 /*
   ============================================================
-  USER INPUTS: 5) COLORS
+  USER INPUTS: 5) CHOROPLETH
+  ============================================================
+  A choropleth shades a polygon layer by data value and displays
+  a legend in the sidebar. It renders below your point and line
+  data, above the basemap.
+
+  Workflow:
+  1) Set enabled: true.
+  2) Point dataFile at your choropleth polygon GeoJSON.
+  3) Set valueField to the numeric property to classify by.
+  4) Define breaks — each entry is [minimumValue, hexColor, legendLabel].
+     A feature gets the color of the highest threshold whose
+     minimumValue is <= the feature's value. Keep entries sorted
+     low-to-high; that order is also easiest to read.
+  5) Adjust nullColor/nullLabel for missing or non-numeric values.
+  6) Set legendTitle to name the legend.
+  7) Set showLegend: true to display the legend in the sidebar.
+*/
+
+const CHOROPLETH_INPUTS = {
+  // Set to true to load and display the choropleth layer.
+  enabled: false,
+
+  // Relative path to the choropleth polygon GeoJSON file.
+  dataFile: "./data/your-choropleth.geojson",
+
+  // Property in the GeoJSON used to determine the color class.
+  valueField: "value",
+
+  // Class breaks: [minimumValue, hexFillColor, legendLabel].
+  // Edit these rows to match your data range and preferred palette.
+  breaks: [
+    [0,   "#f7fbff", "0 – 24"  ],
+    [25,  "#c6dbef", "25 – 49" ],
+    [50,  "#6baed6", "50 – 74" ],
+    [75,  "#2171b5", "75 – 99" ],
+    [100, "#08306b", "≥ 100"   ]
+  ],
+
+  // Color and label for features where valueField is missing or null.
+  nullColor: "#d0d0d0",
+  nullLabel: "No data",
+
+  // Fill opacity for choropleth polygons (0–1).
+  fillOpacity: 0.7,
+
+  // Polygon border style within the choropleth layer.
+  strokeColor:   "#ffffff",
+  strokeWeight:  0.5,
+  strokeOpacity: 0.6,
+
+  // Text shown as the legend heading in the sidebar.
+  legendTitle: "Legend",
+
+  // Show the legend panel in the sidebar?
+  showLegend: true
+};
+
+/*
+  ============================================================
+  USER INPUTS: 6) COLORS
   ============================================================
 */
 
@@ -227,12 +287,21 @@ if (!COLOR_INPUTS.showColorPanel) {
   if (colorToolPanel) colorToolPanel.style.display = "none";
 }
 
+if (!CHOROPLETH_INPUTS.showLegend) {
+  const legendPanel = document.querySelector(".legend-panel");
+  if (legendPanel) legendPanel.style.display = "none";
+}
+
 const map = L.map("map").setView(MAP_CENTER_INPUTS.center, MAP_CENTER_INPUTS.zoom);
 
 L.tileLayer(COLOR_INPUTS.tileUrl, {
   attribution: COLOR_INPUTS.tileAttribution,
   maxZoom: 20
 }).addTo(map);
+
+// Choropleth renders below the data overlay pane (z-index 400) but
+// above the tile pane (z-index 200), so it never obscures points or lines.
+map.createPane("choroplethPane").style.zIndex = 300;
 
 const featureLayers = [];
 const toggleItems = [];
@@ -712,7 +781,87 @@ if (MAP_CENTER_INPUTS.showCenterPanel) {
   });
 }
 
+function getChoroplethColor(value) {
+  if (value === null || value === undefined || value === "") {
+    return CHOROPLETH_INPUTS.nullColor;
+  }
+  const num = parseFloat(value);
+  if (isNaN(num)) return CHOROPLETH_INPUTS.nullColor;
+
+  let color = CHOROPLETH_INPUTS.nullColor;
+  for (const [threshold, fillColor] of CHOROPLETH_INPUTS.breaks) {
+    if (num >= threshold) color = fillColor;
+  }
+  return color;
+}
+
+async function loadChoropleth() {
+  if (!CHOROPLETH_INPUTS.enabled) return;
+  try {
+    const response = await fetch(CHOROPLETH_INPUTS.dataFile);
+    if (!response.ok) {
+      throw new Error(`Could not load ${CHOROPLETH_INPUTS.dataFile} (${response.status})`);
+    }
+    const geojson = await response.json();
+    L.geoJSON(geojson, {
+      pane: "choroplethPane",
+      style: (feature) => {
+        const val = feature.properties?.[CHOROPLETH_INPUTS.valueField];
+        return {
+          fillColor:   getChoroplethColor(val),
+          fillOpacity: CHOROPLETH_INPUTS.fillOpacity,
+          color:       CHOROPLETH_INPUTS.strokeColor,
+          weight:      CHOROPLETH_INPUTS.strokeWeight,
+          opacity:     CHOROPLETH_INPUTS.strokeOpacity
+        };
+      }
+    }).addTo(map);
+  } catch (error) {
+    console.warn("Choropleth layer failed to load:", error.message);
+  }
+}
+
+function renderChoroplethLegend() {
+  if (!CHOROPLETH_INPUTS.showLegend) return;
+
+  const titleEl = document.getElementById("legend-title");
+  if (titleEl) titleEl.textContent = CHOROPLETH_INPUTS.legendTitle;
+
+  const listEl = document.getElementById("legend-list");
+  if (!listEl) return;
+
+  // Display breaks from highest to lowest — conventional for choropleth legends.
+  const sorted = [...CHOROPLETH_INPUTS.breaks].sort((a, b) => b[0] - a[0]);
+
+  sorted.forEach(([, color, label]) => {
+    const item = document.createElement("div");
+    item.className = "legend-item";
+    const swatch = document.createElement("span");
+    swatch.className = "legend-swatch";
+    swatch.style.background = color;
+    const text = document.createElement("span");
+    text.textContent = label;
+    item.appendChild(swatch);
+    item.appendChild(text);
+    listEl.appendChild(item);
+  });
+
+  // Null / no-data row at the bottom.
+  const nullItem = document.createElement("div");
+  nullItem.className = "legend-item";
+  const nullSwatch = document.createElement("span");
+  nullSwatch.className = "legend-swatch";
+  nullSwatch.style.background = CHOROPLETH_INPUTS.nullColor;
+  const nullText = document.createElement("span");
+  nullText.textContent = CHOROPLETH_INPUTS.nullLabel;
+  nullItem.appendChild(nullSwatch);
+  nullItem.appendChild(nullText);
+  listEl.appendChild(nullItem);
+}
+
+loadChoropleth();
 loadGeoJson();
+renderChoroplethLegend();
 
 if (COLOR_INPUTS.showColorPanel) {
   const schemeListEl = document.getElementById("color-scheme-list");
