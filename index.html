@@ -14,8 +14,13 @@
       <p id="map-subtitle">Load a GeoJSON file from the data folder and customize popups in map-settings.js.</p>
     </header>
 
+    <section class="panel setup-status-panel">
+      <p class="setup-status-title">Setup in progress:</p>
+      <ul id="setup-status-list" class="setup-status-list"></ul>
+    </section>
+
     <section class="panel center-panel">
-      <h2>Set Map Center</h2>
+      <h2><span class="setup-badge">🔧</span> Set Map Center</h2>
       <p class="muted">Setup mode: keep this published map page and <code>map-settings.js</code> open in two tabs. Pan/zoom here, then paste values there.</p>
       <p class="muted">Use <code>Copy center &amp; zoom</code>, paste into <code>MAP_CENTER_INPUTS.center</code> and <code>MAP_CENTER_INPUTS.zoom</code>, commit in GitHub, then refresh this page.</p>
       <p class="muted">When your center is final, set <code>MAP_CENTER_INPUTS.showCenterPanel</code> to <code>false</code> in <code>map-settings.js</code>.</p>
@@ -27,10 +32,10 @@
     </section>
 
     <section class="panel layer-toggle-panel">
-      <h2>Layer Toggle Field</h2>
+      <h2><span class="setup-badge">🔧</span> Layer Toggle Field</h2>
       <p class="muted">Setup mode: choose a field to group toggle checkboxes (for example: category, district, type).</p>
       <p class="muted">Pick a field, click <code>Copy toggle field line</code>, paste it into <code>LAYER_TOGGLE_INPUTS</code> in <code>map-settings.js</code>, commit in GitHub, then refresh this page.</p>
-      <p class="muted">If you do not want grouped toggles, use <code>None (toggle each feature)</code> and keep <code>toggleFieldKey: ""</code>.</p>
+      <p class="muted">If you do not want grouped toggles, use <code>None (toggle each feature)</code> and keep <code>toggleFieldKey: ""</code>. When done, set <code>LAYER_TOGGLE_INPUTS.showLayerTogglePanel</code> to <code>false</code>.</p>
       <label class="muted" for="toggle-field-select">Toggle group field</label>
       <select id="toggle-field-select" aria-label="Select field used for layer toggle groups"></select>
       <button class="field-copy" id="copy-toggle-field-btn" type="button">Copy toggle field line</button>
@@ -45,7 +50,7 @@
     </section>
 
     <section class="panel field-panel">
-      <h2>Available Fields</h2>
+      <h2><span class="setup-badge">🔧</span> Available Fields</h2>
       <p class="muted">Setup mode: this list shows every property detected in your GeoJSON.</p>
       <p class="muted">Click <code>Copy popup line</code>, paste lines into <code>POPUP_DATA_INPUTS.popupSections</code> in <code>map-settings.js</code>, commit in GitHub, then refresh this page.</p>
       <p class="muted">When your popup fields are finalized, set <code>POPUP_DATA_INPUTS.showFieldPanel</code> to <code>false</code> in <code>map-settings.js</code>.</p>
@@ -54,7 +59,7 @@
     </section>
 
     <section class="panel color-tool-panel">
-      <h2>Color Settings</h2>
+      <h2><span class="setup-badge">🔧</span> Color Settings</h2>
       <p class="muted">Setup mode: pick a scheme below — the map updates live. When done, set <code>COLOR_INPUTS.colorScheme</code> to your chosen name in <code>map-settings.js</code> and set <code>showColorPanel: false</code>.</p>
       <p class="muted">To use your own colors, choose <code>Custom</code> and edit the <code>customScheme</code> block in <code>map-settings.js</code>.</p>
       <div id="color-scheme-list" role="radiogroup" aria-label="Color scheme"></div>

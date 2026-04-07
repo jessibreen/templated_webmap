@@ -45,6 +45,50 @@ body {
   opacity: 0.95;
 }
 
+.setup-status-panel {
+  background: #fff4e6;
+  border-bottom: 2px solid #ffb347;
+  padding: 10px 16px;
+  flex: none;
+}
+
+.setup-status-title {
+  margin: 0 0 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #d97706;
+}
+
+.setup-status-list {
+  margin: 0;
+  padding-left: 16px;
+  list-style: disc;
+  font-size: 0.82rem;
+  color: #92400e;
+}
+
+.setup-status-list li {
+  margin: 2px 0;
+}
+
+.setup-status-list .setup-complete {
+  list-style: none;
+  color: #15803d;
+  font-weight: 600;
+  padding-left: 0;
+}
+
+.setup-status-list .setup-complete::before {
+  content: "✓ ";
+  margin-right: 4px;
+}
+
+.setup-badge {
+  margin-right: 6px;
+  font-size: 0.9rem;
+  vertical-align: -0.1em;
+}
+
 .panel {
   padding: 14px 16px;
   display: flex;

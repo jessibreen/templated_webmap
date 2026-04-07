@@ -292,6 +292,26 @@ if (!CHOROPLETH_INPUTS.showLegend) {
   if (legendPanel) legendPanel.style.display = "none";
 }
 
+// Populate setup status list with active panels.
+const setupStatusListEl = document.getElementById("setup-status-list");
+const setupPanels = [];
+if (MAP_CENTER_INPUTS.showCenterPanel) setupPanels.push("Set Map Center");
+if (LAYER_TOGGLE_INPUTS.showLayerTogglePanel) setupPanels.push("Layer Toggles");
+if (POPUP_DATA_INPUTS.showFieldPanel) setupPanels.push("Popup Fields");
+if (COLOR_INPUTS.showColorPanel) setupPanels.push("Color Settings");
+
+if (setupStatusListEl) {
+  if (setupPanels.length === 0) {
+    setupStatusListEl.innerHTML = "<li class=\"setup-complete\">✓ All setup complete! Your map is ready.</li>";
+  } else {
+    setupPanels.forEach((panel) => {
+      const item = document.createElement("li");
+      item.textContent = panel;
+      setupStatusListEl.appendChild(item);
+    });
+  }
+}
+
 const map = L.map("map").setView(MAP_CENTER_INPUTS.center, MAP_CENTER_INPUTS.zoom);
 
 L.tileLayer(COLOR_INPUTS.tileUrl, {
