@@ -51,10 +51,10 @@ const MAP_CENTER_INPUTS = {
 
 const TITLE_INPUTS = {
   // Map title shown in the sidebar header and browser tab.
-  title: "My GeoJSON Webmap",
+  title: "Your Title Here",
 
   // Optional subtitle text under the title.
-  subtitle: "Edit map-settings.js to change this text, popup fields, and data source."
+  subtitle: "Subtitle or description goes here"
 };
 
 /*
