@@ -678,6 +678,7 @@ if (COLOR_INPUTS.showColorPanel) {
     featureLayers.forEach((layer) => {
       if (layer instanceof L.CircleMarker) {
         layer.setStyle(workingPointStyle);
+        layer.setRadius(workingPointStyle.radius);
       }
     });
   }
