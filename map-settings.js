@@ -143,9 +143,8 @@ const LAYER_TOGGLE_INPUTS = {
   ============================================================
   USER INPUTS: 5) CHOROPLETH
   ============================================================
-  A choropleth shades a polygon layer by data value and displays
-  a legend in the sidebar. It renders below your point and line
-  data, above the basemap.
+  A choropleth shades a polygon layer by data value. It renders
+  below your point and line data, above the basemap.
 
   Workflow:
   1) Set enabled: true.
@@ -156,8 +155,7 @@ const LAYER_TOGGLE_INPUTS = {
      minimumValue is <= the feature's value. Keep entries sorted
      low-to-high; that order is also easiest to read.
   5) Adjust nullColor/nullLabel for missing or non-numeric values.
-  6) Set legendTitle to name the legend.
-  7) Set showLegend: true to display the legend in the sidebar.
+  6) Set legendTitle if you want to reuse it in LEGEND_INPUTS.
 */
 
 const CHOROPLETH_INPUTS = {
@@ -192,16 +190,63 @@ const CHOROPLETH_INPUTS = {
   strokeWeight:  0.5,
   strokeOpacity: 0.6,
 
-  // Text shown as the legend heading in the sidebar.
+  // Default title reused by LEGEND_INPUTS when mode is "choropleth"
+  // and LEGEND_INPUTS.title is left blank.
   legendTitle: "Legend",
 
-  // Show the legend panel in the sidebar?
+  // Legacy field retained for compatibility.
+  // Use LEGEND_INPUTS.enabled to show or hide the map legend.
   showLegend: true
 };
 
 /*
   ============================================================
-  USER INPUTS: 6) COLORS
+  USER INPUTS: 6) LEGEND
+  ============================================================
+  The legend is best controlled in code, not in the setup panel.
+  Why:
+  - Legend content depends on the type of data being mapped.
+  - Most users only need to decide whether they want a legend, where
+    it should appear, and whether it is driven by choropleth breaks or
+    by a simple manual list.
+  - A map legend is part of the final published map, not a temporary
+    setup helper like the center or popup tools.
+
+  Modes:
+  - "choropleth": builds legend items from CHOROPLETH_INPUTS.breaks.
+  - "manual": use your own items for point, line, polygon, or category maps.
+*/
+
+const LEGEND_INPUTS = {
+  // Show a legend on top of the map?
+  enabled: false,
+
+  // Where the legend sits on the map.
+  // Leaflet options: "topright", "topleft", "bottomright", "bottomleft"
+  position: "bottomright",
+
+  // "choropleth" uses CHOROPLETH_INPUTS.breaks.
+  // "manual" uses the items array below.
+  mode: "choropleth",
+
+  // Leave blank to reuse CHOROPLETH_INPUTS.legendTitle in choropleth mode.
+  title: "",
+
+  // Include the no-data row in choropleth mode?
+  showNoDataItem: true,
+
+  // Manual legend items. Only used when mode is "manual".
+  // shape: "square" | "circle" | "line"
+  items: [
+    { label: "Area features", color: "#2f8b77", shape: "square" },
+    { label: "Routes", color: "#1f6f78", shape: "line" },
+    { label: "Locations", color: "#1f6f78", shape: "circle" }
+  ]
+};
+
+/*
+  ============================================================
+  USER INPUTS: 7) COLORS
   ============================================================
 */
 
@@ -285,11 +330,6 @@ if (!LAYER_TOGGLE_INPUTS.showLayerTogglePanel) {
 if (!COLOR_INPUTS.showColorPanel) {
   const colorToolPanel = document.querySelector(".color-tool-panel");
   if (colorToolPanel) colorToolPanel.style.display = "none";
-}
-
-if (!CHOROPLETH_INPUTS.showLegend) {
-  const legendPanel = document.querySelector(".legend-panel");
-  if (legendPanel) legendPanel.style.display = "none";
 }
 
 // Populate setup status list with active panels.
@@ -841,47 +881,73 @@ async function loadChoropleth() {
   }
 }
 
-function renderChoroplethLegend() {
-  if (!CHOROPLETH_INPUTS.showLegend) return;
+function renderMapLegend() {
+  if (!LEGEND_INPUTS.enabled) return;
+  if (LEGEND_INPUTS.mode === "choropleth" && !CHOROPLETH_INPUTS.enabled) return;
 
-  const titleEl = document.getElementById("legend-title");
-  if (titleEl) titleEl.textContent = CHOROPLETH_INPUTS.legendTitle;
+  const items = LEGEND_INPUTS.mode === "choropleth"
+    ? [...CHOROPLETH_INPUTS.breaks]
+        .sort((a, b) => b[0] - a[0])
+        .map(([, color, label]) => ({ color, label, shape: "square" }))
+    : LEGEND_INPUTS.items;
 
-  const listEl = document.getElementById("legend-list");
-  if (!listEl) return;
+  if (!items.length) return;
 
-  // Display breaks from highest to lowest — conventional for choropleth legends.
-  const sorted = [...CHOROPLETH_INPUTS.breaks].sort((a, b) => b[0] - a[0]);
+  if (LEGEND_INPUTS.mode === "choropleth" && LEGEND_INPUTS.showNoDataItem) {
+    items.push({
+      color: CHOROPLETH_INPUTS.nullColor,
+      label: CHOROPLETH_INPUTS.nullLabel,
+      shape: "square"
+    });
+  }
 
-  sorted.forEach(([, color, label]) => {
-    const item = document.createElement("div");
-    item.className = "legend-item";
-    const swatch = document.createElement("span");
-    swatch.className = "legend-swatch";
-    swatch.style.background = color;
-    const text = document.createElement("span");
-    text.textContent = label;
-    item.appendChild(swatch);
-    item.appendChild(text);
-    listEl.appendChild(item);
-  });
+  const legendControl = L.control({ position: LEGEND_INPUTS.position });
 
-  // Null / no-data row at the bottom.
-  const nullItem = document.createElement("div");
-  nullItem.className = "legend-item";
-  const nullSwatch = document.createElement("span");
-  nullSwatch.className = "legend-swatch";
-  nullSwatch.style.background = CHOROPLETH_INPUTS.nullColor;
-  const nullText = document.createElement("span");
-  nullText.textContent = CHOROPLETH_INPUTS.nullLabel;
-  nullItem.appendChild(nullSwatch);
-  nullItem.appendChild(nullText);
-  listEl.appendChild(nullItem);
+  legendControl.onAdd = () => {
+    const container = document.createElement("div");
+    container.className = "map-legend";
+    L.DomEvent.disableClickPropagation(container);
+    L.DomEvent.disableScrollPropagation(container);
+
+    const title = document.createElement("div");
+    title.className = "map-legend-title";
+    title.textContent = LEGEND_INPUTS.title
+      || (LEGEND_INPUTS.mode === "choropleth" ? CHOROPLETH_INPUTS.legendTitle : "Legend");
+    container.appendChild(title);
+
+    const list = document.createElement("div");
+    list.className = "map-legend-list";
+
+    items.forEach((entry) => {
+      const item = document.createElement("div");
+      item.className = "map-legend-item";
+
+      const swatch = document.createElement("span");
+      const shape = entry.shape || "square";
+      swatch.className = `map-legend-swatch${shape === "circle" ? " is-circle" : ""}${shape === "line" ? " is-line" : ""}`;
+      swatch.style.background = shape === "line" ? "transparent" : entry.color;
+      if (shape === "line") {
+        swatch.style.borderTopColor = entry.color;
+      }
+
+      const text = document.createElement("span");
+      text.textContent = entry.label;
+
+      item.appendChild(swatch);
+      item.appendChild(text);
+      list.appendChild(item);
+    });
+
+    container.appendChild(list);
+    return container;
+  };
+
+  legendControl.addTo(map);
 }
 
 loadChoropleth();
 loadGeoJson();
-renderChoroplethLegend();
+renderMapLegend();
 
 if (COLOR_INPUTS.showColorPanel) {
   const schemeListEl = document.getElementById("color-scheme-list");
