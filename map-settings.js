@@ -51,10 +51,10 @@ const MAP_CENTER_INPUTS = {
 
 const TITLE_INPUTS = {
   // Map title shown in the sidebar header and browser tab.
-  title: "Your Title Here",
+  title: "Hedgehog Sanctuary Sample Map",
 
   // Optional subtitle text under the title.
-  subtitle: "Subtitle or description goes here"
+  subtitle: "Fictional sample data for testing popups, media links, and setup tools."
 };
 
 /*
@@ -75,12 +75,16 @@ const POPUP_DATA_INPUTS = {
   // Relative path to a GeoJSON file in /data.
   dataFile: "./data/your-data.geojson",
 
+  // Keep GeoJSON files in /data.
+  // Keep image files in /images, audio files in /audio,
+  // and video files in /video.
+
   // Which GeoJSON property should be used as the feature display name.
   // If missing, the template falls back to "Feature N" labels.
-  listNameField: "OrgName",
+  listNameField: "SanctuaryName",
 
   // Property used as the popup title.
-  popupTitleField: "OrgName",
+  popupTitleField: "SanctuaryName",
 
   // Show the "Available Fields" helper panel in the sidebar?
   // STEP 1: Set true while building popup sections.
@@ -96,18 +100,28 @@ const POPUP_DATA_INPUTS = {
     heading: "Contact",
     showWhenEmpty: false,
     fields: [
-      { key: "OrgEmail", label: "Email", type: "email" },
-      { key: "OrgPhone", label: "Phone" },
-      { key: "OrgWebSite", label: "Website", type: "url" }
+      { key: "ContactEmail", label: "Email", type: "email" },
+      { key: "Phone", label: "Phone" },
+      { key: "Website", label: "Website", type: "url" },
+      { key: "VisitingHours", label: "Visiting Hours" }
     ]
   },
   {
     heading: "About",
     showWhenEmpty: false,
     fields: [
-      { key: "Mission", label: "Mission" },
-      { key: "group_type", label: "Group Type" },
-      { key: "District", label: "District" }
+      { key: "Region", label: "Region" },
+      { key: "SanctuaryType", label: "Sanctuary Type" },
+      { key: "Description", label: "Description" }
+    ]
+  },
+  {
+    heading: "Media",
+    showWhenEmpty: false,
+    fields: [
+      { key: "PhotoFile", label: "Photo", type: "image" },
+      { key: "SoundFile", label: "Sound", type: "audio" },
+      { key: "VideoFile", label: "Video", type: "video" }
     ]
   }
   ]
@@ -385,7 +399,8 @@ function asDisplayValue(value) {
 
 function ensureHttp(url) {
   if (!url) return "";
-  if (/^https?:\/\//i.test(url)) return url;
+  if (/^(https?:\/\/|mailto:|tel:)/i.test(url)) return url;
+  if (/^(\/|\.\/|\.\.\/|#)/.test(url)) return url;
   return `https://${url}`;
 }
 
@@ -402,6 +417,24 @@ function formatFieldValue(rawValue, field) {
     const safeUrl = ensureHttp(clean);
     const safeLabel = escapeHtml(clean);
     return `<a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener">${safeLabel}</a>`;
+  }
+
+  if (field.type === "image") {
+    const safeUrl = ensureHttp(clean);
+    const safeAlt = escapeHtml(field.label || "Image");
+    return `<a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener"><img class="popup-image" src="${escapeHtml(safeUrl)}" alt="${safeAlt}"></a>`;
+  }
+
+  if (field.type === "audio") {
+    const safeUrl = ensureHttp(clean);
+    const safeLabel = escapeHtml(clean.split("/").pop() || clean);
+    return `<audio class="popup-audio" controls preload="none" src="${escapeHtml(safeUrl)}"></audio><div><a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener">${safeLabel}</a></div>`;
+  }
+
+  if (field.type === "video") {
+    const safeUrl = ensureHttp(clean);
+    const safeLabel = escapeHtml(clean.split("/").pop() || clean);
+    return `<video class="popup-video" controls preload="metadata" src="${escapeHtml(safeUrl)}"></video><div><a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener">${safeLabel}</a></div>`;
   }
 
   return escapeHtml(clean);
@@ -632,6 +665,29 @@ function inferType(value) {
 function inferPopupType(key, sampleValue) {
   const keyLower = String(key).toLowerCase();
   const sample = String(sampleValue || "");
+
+  if (
+    keyLower.includes("image") ||
+    keyLower.includes("photo") ||
+    /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(sample)
+  ) {
+    return "image";
+  }
+
+  if (
+    keyLower.includes("audio") ||
+    keyLower.includes("sound") ||
+    /\.(mp3|wav|ogg|m4a)$/i.test(sample)
+  ) {
+    return "audio";
+  }
+
+  if (
+    keyLower.includes("video") ||
+    /\.(mp4|webm|mov|m4v)$/i.test(sample)
+  ) {
+    return "video";
+  }
 
   if (keyLower.includes("email") || sample.includes("@")) {
     return "email";

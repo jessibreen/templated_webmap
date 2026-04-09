@@ -5,6 +5,7 @@ This folder is a reusable Leaflet webmap template.
 ## What this template is for
 
 - Load a GeoJSON file placed in `webmap-template/data/`
+- Keep images, audio, and video in dedicated top-level folders
 - Change map title/subtitle
 - Change map center/zoom
 - Control popup field order and section placement in one JavaScript file
@@ -15,6 +16,10 @@ This folder is a reusable Leaflet webmap template.
 - `index.html`: app shell
 - `styles.css`: visual styling
 - `map-settings.js`: configuration + logic (heavily commented)
+- `data/`: GeoJSON files only
+- `images/`: local image files for popups
+- `audio/`: local audio files for popups
+- `video/`: local video files for popups
 
 ## After copying this template: publish first
 
@@ -48,29 +53,30 @@ This template is designed for that two-tab workflow (published map + `map-settin
 ## Workflow
 
 1. In your GitHub repo, upload your GeoJSON into `data/`.
-2. Open two tabs and keep both open while you configure the map:
+2. Upload popup images into `images/`, audio into `audio/`, and video into `video/`.
+3. Open two tabs and keep both open while you configure the map:
    - `map-settings.js` in the GitHub website editor
    - your published map page
-3. Set `POPUP_DATA_INPUTS.dataFile` to your filename.
-4. Commit changes.
-5. Refresh the published map page.
-6. **Setup phase: Set Map Center**
+4. Set `POPUP_DATA_INPUTS.dataFile` to your filename.
+5. Commit changes.
+6. Refresh the published map page.
+7. **Setup phase: Set Map Center**
    - Pan and zoom the map until your study area is framed the way you want.
    - Click **Copy center & zoom** — this copies two ready-to-paste lines.
    - Back in `map-settings.js`, replace the `center` and `zoom` values in `MAP_CENTER_INPUTS` with the copied values.
    - Commit in GitHub and refresh the published map page.
    - Final map step: set `MAP_CENTER_INPUTS.showCenterPanel` to `false` when centering is done.
-7. **Setup phase: Layer Toggle Field**
+8. **Setup phase: Layer Toggle Field**
    - In the map sidebar, choose a grouping field in **Layer Toggle Field**.
    - Click **Copy toggle field line** and paste it into `LAYER_TOGGLE_INPUTS.toggleFieldKey` in `map-settings.js`.
    - Commit in GitHub and refresh the published map page.
    - Final map step: set `LAYER_TOGGLE_INPUTS.showLayerTogglePanel` to `false` when this helper is no longer needed.
-8. **Setup phase: Available Fields / Popup Data**
+9. **Setup phase: Available Fields / Popup Data**
    - Use **Available Fields** to review properties and click **Copy popup line** for fields you want.
    - Paste copied lines into `POPUP_DATA_INPUTS.popupSections` and reorder them as needed.
    - Commit in GitHub and refresh the published map page.
    - Final map step: set `POPUP_DATA_INPUTS.showFieldPanel` to `false` when popup setup is complete.
-9. Final checks:
+10. Final checks:
    - Confirm your map opens with the right center/zoom.
    - Confirm toggles and popups behave as expected.
    - Keep helper panels off for the final published view.
@@ -79,6 +85,8 @@ This template is designed for that two-tab workflow (published map + `map-settin
 
 - Feature names in the sidebar come from `POPUP_DATA_INPUTS.listNameField`.
 - Popup title comes from `POPUP_DATA_INPUTS.popupTitleField`.
+- Popup field types supported by the template are `email`, `url`, `image`, `audio`, and `video`.
+- Keep GeoJSON in `data/` and use relative media paths like `./images/photo.jpg`, `./audio/sound.mp3`, or `./video/clip.mp4` in popup fields.
 - If those fields are missing, the template uses fallback labels.
 - The template works with many different datasets and geographies, not just Hawaii.
 

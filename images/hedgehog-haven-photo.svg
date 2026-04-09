@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#345d58"/>
+      <stop offset="100%" stop-color="#213b42"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg)"/>
+  <g fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="4">
+    <path d="M120 580 C260 420, 420 390, 560 510 S900 660, 1080 500"/>
+    <path d="M90 640 C250 520, 420 500, 600 600 S910 760, 1110 620"/>
+  </g>
+  <circle cx="930" cy="170" r="74" fill="rgba(255,255,255,0.18)"/>
+  <g transform="translate(300 430)">
+    <ellipse cx="180" cy="105" rx="190" ry="110" fill="#855f44"/>
+    <ellipse cx="330" cy="110" rx="80" ry="70" fill="#d0b59c"/>
+    <circle cx="355" cy="98" r="8" fill="#1f2a30"/>
+    <circle cx="392" cy="114" r="6" fill="#1f2a30"/>
+    <path d="M45 65 L0 18 M75 40 L35 0 M120 28 L98 -18 M170 20 L170 -30 M220 24 L245 -18 M270 35 L306 -2 M315 60 L360 24" stroke="#f7f2e8" stroke-width="16" stroke-linecap="round"/>
+    <text x="180" y="235" text-anchor="middle" font-family="Avenir Next, Helvetica, Arial, sans-serif" font-size="46" fill="#fff8ef">Moonlit Hedgehog Haven</text>
+  </g>
+</svg>

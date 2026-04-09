@@ -4,11 +4,17 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Example Place A",
-        "category": "Community",
-        "description": "Replace this file with user data.",
-        "website": "example.org",
-        "email": "hello@example.org"
+        "SanctuaryName": "Moonlit Hedgehog Haven",
+        "Region": "North Garden District",
+        "SanctuaryType": "Night Rescue Center",
+        "Description": "A fictional rescue and release site with moonlit nesting beds, warm lamp shelters, and supervised dusk visits.",
+        "Website": "https://example.org/moonlit-hedgehog-haven",
+        "ContactEmail": "hello@moonlithedgehogs.example",
+        "Phone": "(555) 010-2401",
+        "VisitingHours": "Tue-Sat, 6:00 PM-8:30 PM",
+        "PhotoFile": "./images/hedgehog-haven-photo.svg",
+        "SoundFile": "./audio/hedgehog-haven-sound.wav",
+        "VideoFile": ""
       },
       "geometry": {
         "type": "Point",
@@ -18,14 +24,41 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Example Place B",
-        "category": "Education",
-        "description": "This sample helps the template run immediately.",
-        "website": "https://example.com"
+        "SanctuaryName": "Pricklebloom Hedgehog Sanctuary",
+        "Region": "Fern Hollow",
+        "SanctuaryType": "Habitat Garden",
+        "Description": "An imaginary community garden that protects hedgehog corridors with native plantings and quiet overnight habitat patches.",
+        "Website": "https://example.org/pricklebloom",
+        "ContactEmail": "visits@pricklebloom.example",
+        "Phone": "(555) 010-2402",
+        "VisitingHours": "Sun, Wed, Fri, 5:30 PM-7:00 PM",
+        "PhotoFile": "./images/pricklebloom-photo.svg",
+        "SoundFile": "./audio/pricklebloom-sound.wav",
+        "VideoFile": ""
       },
       "geometry": {
         "type": "Point",
         "coordinates": [-157.88, 21.50]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "SanctuaryName": "Bramble Burrow Learning Lodge",
+        "Region": "Willow Point",
+        "SanctuaryType": "Education Center",
+        "Description": "A made-up outreach lodge where volunteers teach safe backyard hedgehog practices and demonstrate low-light monitoring methods.",
+        "Website": "https://example.org/bramble-burrow",
+        "ContactEmail": "programs@brambleburrow.example",
+        "Phone": "(555) 010-2403",
+        "VisitingHours": "Mon-Thu, 4:00 PM-6:30 PM",
+        "PhotoFile": "./images/bramble-burrow-photo.svg",
+        "SoundFile": "./audio/bramble-burrow-sound.wav",
+        "VideoFile": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-157.90, 21.455]
       }
     }
   ]
