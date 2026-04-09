@@ -15,7 +15,8 @@ This folder is a reusable Leaflet webmap template.
 
 - `index.html`: app shell
 - `styles.css`: visual styling
-- `map-settings.js`: configuration + logic (heavily commented)
+- `map-settings.js`: user-editable configuration only
+- `app.js`: map logic that reads from `map-settings.js`
 - `data/`: GeoJSON files only
 - `images/`: local image files for popups
 - `audio/`: local audio files for popups
@@ -40,15 +41,16 @@ This template is designed for that two-tab workflow (published map + `map-settin
 ## Main setup steps
 
 1. Open `map-settings.js`.
-2. In `POPUP_DATA_INPUTS`, set:
+2. Only edit `map-settings.js` unless you intentionally want to change how the template itself works.
+3. In `POPUP_DATA_INPUTS`, set:
    - `dataFile` (for example `./data/my-project.geojson`)
-3. In `TITLE_INPUTS`, set:
+4. In `TITLE_INPUTS`, set:
    - `title`
    - `subtitle`
-4. In `MAP_CENTER_INPUTS`, set:
+5. In `MAP_CENTER_INPUTS`, set:
    - `center` and `zoom` (use the **Set Map Center** panel to find these values — see Workflow below)
-5. In `POPUP_DATA_INPUTS.popupSections`, reorder/add/remove fields to control popup layout.
-6. In `COLOR_INPUTS`, adjust map colors/symbol styling.
+6. In `POPUP_DATA_INPUTS.popupSections`, reorder/add/remove fields to control popup layout.
+7. In `COLOR_INPUTS`, adjust map colors/symbol styling.
 
 ## Workflow
 
